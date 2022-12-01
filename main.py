@@ -2,7 +2,7 @@
 import pygame
 
 # Classes
-class Engine: # Game's class
+class Game: # Game's class
     def __init__(self): # Game's initialization
         pygame.init() # Pygame's initialization
         self.window_size = (1200, 800) # Window size
