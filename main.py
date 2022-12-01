@@ -11,6 +11,7 @@ class Game: # Game's class
 
     def update(self): # Update the game
         self.screen.fill((0, 0, 0))
+        self.event_handler()
         pygame.display.flip()
     def event_handler(self): # Check Event
         for event in pygame.event.get():
