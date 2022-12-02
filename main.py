@@ -9,6 +9,7 @@ class Game:  # Game's class
         pygame.init()  # Pygame's initialization
         self.window_size = (1200, 800)  # Window size
         self.screen = pygame.display.set_mode(self.window_size)  # Screen
+        pygame.display.set_caption("car and road")
 
     def update(self):  # Update the game
         self.screen.fill('white')
