@@ -13,7 +13,6 @@ class GUI:
         self.buttons = []
         self.background_img = pygame.image.load('images/C-A-R_Background.png')
         self.bg_rect = self.background_img.get_rect()
-        self.bg_rect.center = self.screen_rect.center
         self.running = True
 
     @staticmethod
@@ -39,17 +38,12 @@ class GUI:
                 self.check_mouse_events(x, y)
             elif event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE:
                 self.running = False
-                break
-            if not self.running:
-                break
 
     def check_mouse_events(self, x: float, y: float):
         button_clicked = {}
         for button in self.buttons:
             button_clicked.update({button: button.rect.collidepoint(x, y)})
             self.checking_clicks(button_clicked)
-            if not self.running:
-                break
 
     def checking_clicks(self, button_clicked):
         pass
@@ -93,8 +87,6 @@ class MainMenu(GUI):
                 sys.exit()
             elif button_clicked[button] and button.text_str == 'Настройки':
                 self.options.run()
-            if not self.running:
-                break
 
 
 class Options(GUI):
@@ -106,4 +98,4 @@ class Options(GUI):
         for button in button_clicked:
             if button_clicked[button] and button.text_str == 'Вернуться назад':
                 self.running = False
-                break
+                MainMenu().run()
