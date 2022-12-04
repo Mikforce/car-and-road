@@ -1,7 +1,7 @@
 import pygame
 import sys
 from button import Button
-from typing import Union, Tuple
+from typing import Union, Tuple, Dict
 
 
 class GUI:
@@ -45,7 +45,7 @@ class GUI:
             button_clicked.update({button: button.rect.collidepoint(x, y)})
             self.checking_clicks(button_clicked)
 
-    def checking_clicks(self, button_clicked):
+    def checking_clicks(self, button_clicked: Dict[Button: bool]):
         pass
 
     def run(self):
@@ -81,7 +81,7 @@ class MainMenu(GUI):
         pygame.display.update()
         pygame.display.flip()
 
-    def checking_clicks(self, button_clicked):
+    def checking_clicks(self, button_clicked: Dict[Button: bool]):
         for button in button_clicked:
             if button_clicked[button] and button.text_str == 'Выйти из игры':
                 sys.exit()
@@ -94,7 +94,7 @@ class Options(GUI):
         super().__init__()
         self.buttons = [Button(self.screen, pygame.Rect(50, 50, 300, 50), 'purple', 'Вернуться назад', 'yellow')]
 
-    def checking_clicks(self, button_clicked):
+    def checking_clicks(self, button_clicked: Dict[Button, bool]):
         for button in button_clicked:
             if button_clicked[button] and button.text_str == 'Вернуться назад':
                 self.running = False
