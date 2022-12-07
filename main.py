@@ -1,35 +1,49 @@
-# Import moduls
+import pygame as pg
+import moderngl as mgl
 import sys
-import pygame
-from OpenGL.GL import *
-from OpenGL.GLU import *
-from OpenGL.GLUT import *
-
+from model import *
+from camera import Camera
 
 # Classes
 class Game:  # Game's class
-    def __init__(self):  # Game's initialization
-        pygame.init()  # Pygame's initialization
-        self.window_size = (1200, 800)  # Window size
-        self.screen = pygame.display.set_mode(self.window_size)  # Screen
-
-    def update(self):  # Update the game
-        self.screen.fill('white')
-        pygame.display.update()
-        pygame.display.flip()
+    def __init__(self, win_size=(1600, 900)):  # Game's initialization
+        pg.init()
+        self.win_size = win_size
+        pg.display.gl_set_attribute(pg.GL_CONTEXT_MAJOR_VERSION, 3)
+        pg.display.gl_set_attribute(pg.GL_CONTEXT_MINOR_VERSION, 3)
+        pg.display.gl_set_attribute(pg.GL_CONTEXT_PROFILE_MASK, pg.GL_CONTEXT_PROFILE_CORE)
+        pg.display.set_mode(self.win_size, flags=pg.OPENGL | pg.DOUBLEBUF)
+        self.ctx = mgl.create_context()
+        self.clock = pg.time.Clock()
+        self.time = 0
+        self.camera = Camera(self)
+        self.scene = Cube(self)
 
     @staticmethod
-    def event_handler():  # Check Event
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+    def check_event():
+        for event in pg.event.get():
+            if event.type == pg.QUIT or (event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE):
+                pg.quit()
                 sys.exit()
 
-    def run(self):
+    def render(self):
+        self.ctx.clear()
+        self.scene.render()
+        pg.display.flip()
+
+    def get_time(self):
+        self.time = pg.time.get_ticks() * 0.001
+
+    def update(self):
         while True:
-            self.update()
-            self.event_handler()
+            self.get_time()
+            self.check_event()
+            self.render()
+            self.clock.tick(60)
 
+    def run(self):
+        self.update()
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     game = Game()
-    game.run()  # Game's run
+    game.run()
