@@ -17,7 +17,7 @@ class Game(ShowBase):
         def spinCameraTask(self, task):
             angleDegrees = task.time * 6.0
             angleRadians = angleDegrees * (pi / 180.0)
-            self.camera.setPos(5, 0, 0)
+            self.camera.setPos(5, 0, 5)
             self.camera.setHpr(angleDegrees, 0, 0)
             return Task.cont
 
