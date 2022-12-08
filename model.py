@@ -12,8 +12,7 @@ class Cube:
         self.on_init()
 
     def update(self):
-        m_model = glm.rotate(self.m_model, self.app.time, glm.vec3(0, 1, 0))
-        self.shader_program['m_model'].write(m_model)
+        self.shader_program['m_model'].write(self.m_model)
 
     def get_model_matrix(self):
         m_model = glm.mat4()
