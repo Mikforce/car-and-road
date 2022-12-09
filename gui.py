@@ -38,6 +38,9 @@ class GUI:
                 self.check_mouse_events(x, y)
             elif event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE:
                 self.running = False
+                break
+            if not self.running:
+                break
 
     def check_mouse_events(self, x: float, y: float):
         button_clicked = {}
@@ -45,7 +48,7 @@ class GUI:
             button_clicked.update({button: button.rect.collidepoint(x, y)})
             self.checking_clicks(button_clicked)
 
-    def checking_clicks(self, button_clicked: Dict[Button: bool]):
+    def checking_clicks(self, button_clicked: Dict[Button, bool]):
         pass
 
     def run(self):
@@ -61,6 +64,7 @@ class MainMenu(GUI):
         self.title_font = pygame.font.Font('fonts/PixeloidMono-1G8ae.ttf', 100)
         self.title_font.bold = True
         self.options = Options()
+        self.game = Game()
         self.buttons = {
             'start_button': {'rect': pygame.Rect(self.screen_rect.centerx - 100,
                                                  self.screen_rect.centery - 150, 200, 50),
@@ -81,12 +85,16 @@ class MainMenu(GUI):
         pygame.display.update()
         pygame.display.flip()
 
-    def checking_clicks(self, button_clicked: Dict[Button: bool]):
+    def checking_clicks(self, button_clicked: Dict[Button, bool]):
         for button in button_clicked:
-            if button_clicked[button] and button.text_str == 'Выйти из игры':
+            if button_clicked[button] and button.text_str == 'Начать игру':
+                self.game.run()
+                break
+            elif button_clicked[button] and button.text_str == 'Выйти из игры':
                 sys.exit()
             elif button_clicked[button] and button.text_str == 'Настройки':
                 self.options.run()
+                break
 
 
 class Options(GUI):
@@ -98,4 +106,17 @@ class Options(GUI):
         for button in button_clicked:
             if button_clicked[button] and button.text_str == 'Вернуться назад':
                 self.running = False
-                MainMenu().run()
+                break
+
+
+class Game(GUI):
+    def __init__(self):
+        super().__init__()
+
+        self.buttons = [Button(self.screen, pygame.Rect(50, 50, 300, 50), 'purple', 'Вернуться назад', 'yellow')]
+
+    def checking_clicks(self, button_clicked: Dict[Button, bool]):
+        for button in button_clicked:
+            if button_clicked[button] and button.text_str == 'Вернуться назад':
+                self.running = False
+                break
