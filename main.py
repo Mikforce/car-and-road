@@ -2,6 +2,7 @@ from direct.showbase.ShowBase import ShowBase
 from panda3d.core import *
 from panda3d.physics import *
 
+base = ShowBase()
 
 class Game(ShowBase):
     def __init__(self):
@@ -32,11 +33,18 @@ class Game(ShowBase):
         self.car.setHpr(90, 0, 90)
         self.scene.setHpr(90, 0, 90)
 
-        # Movement
-
+        # Buttons
+        self.d_button = map.get_mapped_button("d")
+        self.a_button = map.get_mapped_button("a")
+    @staticmethod
+    def update(self):
+        while True:
+            self.input()
     def input(self):
-        self.accept("a", self.movement(-1))
-        self.accept("d", self.movement(1))
+        if base.mouseWatcherNode.is_button_down(self.d_button):
+            self.movement(1)
+        if base.mouseWatcherNode.is_button_down(self.a_button):
+            self.movement(-1)
 
     def movement(self, x):
         print(x)
