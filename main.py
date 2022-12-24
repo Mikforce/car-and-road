@@ -1,7 +1,9 @@
 from direct.showbase.ShowBase import ShowBase
 from panda3d.core import *
+from direct.task import Task
 from panda3d.physics import *
 import time
+import random
 
 class Game(ShowBase):
     def __init__(self):
@@ -20,7 +22,7 @@ class Game(ShowBase):
         # Set Texture
         self.car.set_texture(self.car_texture, 1)
 
-        # ReparentTo
+        #Reparent To
         self.scene.reparentTo(self.render)
         self.car.reparentTo(self.render)
         self.obstacle1.reparentTo(self.render)
@@ -43,6 +45,7 @@ class Game(ShowBase):
         # Buttons
         self.accept('a', self.input)
         self.accept('d', self.input)
+        self.accept('r', self.spawn_obstacle)
 
         self.is_down = self.mouseWatcherNode.is_button_down
 
@@ -51,11 +54,27 @@ class Game(ShowBase):
 
         # self.disableMouse()
 
-    def update(self):
-        while True:
-            print(123)
-            time.sleep(0.1)
+        self.taskMgr.add(self.update, "update")
 
+        self.obst1y = 50
+        self.obst2y = 50
+    def spawn_obstacle(self):
+        arr = []
+        for i in range(2):
+            arr.append(random.choice(self.arr))
+        self.obstacle1.setPos(arr[0], 50, -0.74)
+        self.obstacle2.setPos(arr[1], 50, -0.74)
+
+    def obstacle_movement(self):
+        self.obst1y -= 1
+        self.obst2y -= 1
+        self.obstacle1.setPos(0, self.obst1y, -0.74)
+        self.obstacle2.setPos(0, self.obst2y, -0.74)
+
+    def update(self, task):
+        self.obstacle_movement()
+        # self.spawn_obstacle()
+        return task.cont
     def input(self):
         if self.is_down("d"):
             self.movement(1)
@@ -66,6 +85,7 @@ class Game(ShowBase):
         if self.moveArr + x in range(len(self.arr)):
             self.moveArr += x
             self.car.setPos(self.arr[self.moveArr], 6.5, -0.74)
+
 
 if __name__ == '__main__':
     game = Game()
