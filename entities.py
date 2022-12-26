@@ -1,29 +1,22 @@
-from panda3d.core import Vec3, Vec2
+from panda3d.core import Vec3, Vec2, NodePath
 from direct.actor.Actor import Actor
 from direct.showbase.ShowBase import ShowBase
 from panda3d.core import CollisionSphere, CollisionNode
 import random
-
-class GameObject():
-    def __init__(self, pos: Vec3, speed: float, chance_to_spawn_type: int, collider_name, render, model):
+import calc as calc_
+class GameObject:
+    def __init__(self, pos: Vec3, render, model):
         # Obstacle's object
         self.actor = Actor(model)
         self.actor.reparentTo(render)
         self.actor.setPos(pos)
-        self.type = None
-        # Speed
+
+class Obstacle(GameObject):
+    def __init__(self, pos: Vec3, speed: int, chance_to_spawn: int, collider_name, render, model):
+        super().__init__(pos=pos, render=render, model=model)
         self.speed = speed
+        if calc_.Calculations.check_chance(chance_to_spawn):
+            self.type = "Money"
+        else:
+            self.type = "Obstacle"
 
-    def movement(self, speed):
-        self.actor.setPos(self.actor.getPos().x - speed, self.actor.getPos().y, self.actor.getPos().z)
-
-    def update(self):
-        self.movement(self.speed)
-
-    def spawn_type(self):
-        pass
-
-class Obstacle(GameObject, ShowBase):
-    def __init__(self, pos, speed, chance_to_spawn, collider_name, render):
-        self.model = self.loader.loadModel("")
-        GameObject.__init__(self, pos, speed, chance_to_spawn, collider_name, render, self.model)

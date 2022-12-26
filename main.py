@@ -8,11 +8,7 @@ from calc import *
 class Game(ShowBase):
     def __init__(self):
         ShowBase.__init__(self)
-        self.calc = Calculations
-        self.base = ShowBase
-        self.base.enableParticles(self)
-        self.gravityForce = LinearVectorForce(0, 0, -9.81/10)  # gravity acceleration
-        self.base.physicsMgr.addLinearForce(self.gravityForce)
+        self.calc = Calculations()
 
         # Nodes
         self.node = NodePath("PhysicsNode")
@@ -39,9 +35,6 @@ class Game(ShowBase):
 
         # Set Texture
         self.car.set_texture(self.car_texture, 1)
-
-        # Self
-        self.base.physicsMgr.attachPhysicalNode(self.carActor)
 
         #Reparent To
         self.node.reparentTo(self.render)
@@ -77,11 +70,6 @@ class Game(ShowBase):
         self.accept('d', self.input)
         self.accept('r', self.spawn_obstacle)
 
-        # Collision
-        self.carCol = self.car.attachNewNode(CollisionNode('colNode'))
-        self.carCol.node().addSolid(CollisionBox(0, 0, 0, 1))
-        self.ColMan = CollisionHandlerPusher()
-        self.ColMan.addCollider(self.carCol, self.car)
 
         self.is_down = self.mouseWatcherNode.is_button_down
 
@@ -96,11 +84,8 @@ class Game(ShowBase):
         self.obst2y = self.obstacle2.getPos().y
 
         self.spawn_obstacle()
-
-        # Physics
-        self.carActor.getPhysicsObject().setMass(136.077)
     def spawn_obstacle(self):
-        arr = self.calc.random_choice(self, self.arr, 6)
+        arr = self.calc.random_choice(self.arr, 6)
         self.obstacle1.setPos(arr[0], 50, -0.74)
         self.obstacle2.setPos(arr[1], 50, -0.74)
         self.obstacle3.setPos(arr[2], 70, -0.74)
@@ -117,7 +102,7 @@ class Game(ShowBase):
         self.obstacle6.setPos(self.obstacle6.getPos().x, self.obstacle6.getPos().y - 1, -0.74)
 
     def update(self, task):
-        if self.obstacle6.getPos().y > 0:
+        if self.obstacle6.getPos().y >= 0:
             self.obstacle_movement()
             return task.cont
         else:
