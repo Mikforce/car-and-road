@@ -4,12 +4,13 @@ from direct.task import Task
 from panda3d.physics import *
 import random
 from calc import *
-
+from panda3dfunctions import *
+from entities import *
+import time
 class Game(ShowBase):
     def __init__(self):
         ShowBase.__init__(self)
         self.calc = Calculations()
-
         # Nodes
         self.node = NodePath("PhysicsNode")
 
@@ -19,12 +20,6 @@ class Game(ShowBase):
         # Model Init
         self.scene = self.loader.loadModel("models/roads2.obj")
         self.car = self.loader.loadModel("models/car.gltf")
-        self.obstacle1 = self.loader.loadModel("models/car.gltf")
-        self.obstacle2 = self.loader.loadModel("models/car.gltf")
-        self.obstacle3 = self.loader.loadModel("models/car.gltf")
-        self.obstacle4 = self.loader.loadModel("models/car.gltf")
-        self.obstacle5 = self.loader.loadModel("models/car.gltf")
-        self.obstacle6 = self.loader.loadModel("models/car.gltf")
         self.car.ls()
 
         # Attach Node
@@ -40,22 +35,10 @@ class Game(ShowBase):
         self.node.reparentTo(self.render)
         self.scene.reparentTo(self.render)
         self.car.reparentTo(self.carActorN)
-        self.obstacle1.reparentTo(self.render)
-        self.obstacle2.reparentTo(self.render)
-        self.obstacle3.reparentTo(self.render)
-        self.obstacle4.reparentTo(self.render)
-        self.obstacle5.reparentTo(self.render)
-        self.obstacle6.reparentTo(self.render)
 
         # Scale
         self.scene.setScale(0.26, 0.26, 10)
         self.car.setScale(0.25, 0.25, 0.25)
-        self.obstacle1.setScale(0.25, 0.25, 0.25)
-        self.obstacle2.setScale(0.25, 0.25, 0.25)
-        self.obstacle3.setScale(0.25, 0.25, 0.25)
-        self.obstacle4.setScale(0.25, 0.25, 0.25)
-        self.obstacle5.setScale(0.25, 0.25, 0.25)
-        self.obstacle6.setScale(0.25, 0.25, 0.25)
 
         # Pos
         self.scene.setPos(0, 6.5, -1)
@@ -66,10 +49,10 @@ class Game(ShowBase):
         self.scene.setHpr(90, 0, 90)
 
         # Buttons
-        self.accept('a', self.input)
-        self.accept('d', self.input)
-        self.accept('r', self.spawn_obstacle)
+        self.accept("d", self.input)
+        self.accept("a", self.input)
 
+        self.obstacle_arr = []
 
         self.is_down = self.mouseWatcherNode.is_button_down
 
@@ -79,35 +62,28 @@ class Game(ShowBase):
         # self.disableMouse()
 
         self.taskMgr.add(self.update, "update")
+        self.taskMgr.add(self.del_obstacle, "del_obstacle")
 
-        self.obst1y = self.obstacle1.getPos().y
-        self.obst2y = self.obstacle2.getPos().y
+        # self.obst1y = self.obstacle1.getPos().y
+        # self.obst2y = self.obstacle2.getPos().y
 
-        self.spawn_obstacle()
     def spawn_obstacle(self):
-        arr = self.calc.random_choice(self.arr, 6)
-        self.obstacle1.setPos(arr[0], 50, -0.74)
-        self.obstacle2.setPos(arr[1], 50, -0.74)
-        self.obstacle3.setPos(arr[2], 70, -0.74)
-        self.obstacle4.setPos(arr[3], 70, -0.74)
-        self.obstacle5.setPos(arr[4], 90, -0.74)
-        self.obstacle6.setPos(arr[5], 90, -0.74)
+        self.obs = Obstacle(Vec3(self.arr[0], 50, -0.74), 0, 100, self.render, self)
+        self.taskMgr.add(self.obs.update, "update_obs")
 
     def obstacle_movement(self):
-        self.obstacle1.setPos(self.obstacle1.getPos().x, self.obstacle1.getPos().y - 1, -0.74)
-        self.obstacle2.setPos(self.obstacle2.getPos().x, self.obstacle2.getPos().y - 1, -0.74)
-        self.obstacle3.setPos(self.obstacle3.getPos().x, self.obstacle3.getPos().y - 1, -0.74)
-        self.obstacle4.setPos(self.obstacle4.getPos().x, self.obstacle4.getPos().y - 1, -0.74)
-        self.obstacle5.setPos(self.obstacle5.getPos().x, self.obstacle5.getPos().y - 1, -0.74)
-        self.obstacle6.setPos(self.obstacle6.getPos().x, self.obstacle6.getPos().y - 1, -0.74)
+        pass
 
     def update(self, task):
-        if self.obstacle6.getPos().y >= 0:
-            self.obstacle_movement()
-            return task.cont
-        else:
-            self.spawn_obstacle()
-            return task.cont
+        self.arr = self.calc.random_choice(self.arr, 1)
+        self.spawn_obstacle()
+        return task.cont
+
+    def del_obstacle(self, task):
+        if len(self.obstacle_arr) > 6:
+            self.obstacle_arr.remove(self.obstacle_arr[len(self.obstacle_arr) - 1])
+        print(len(self.obstacle_arr))
+        return task.cont
 
     def input(self):
         if self.is_down("d"):
