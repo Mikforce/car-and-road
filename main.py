@@ -1,12 +1,17 @@
+# Other functions
 from direct.showbase.ShowBase import ShowBase
 from panda3d.core import *
 from direct.task import Task
 from panda3d.physics import *
+import time
 import random
+
+# My functions
 from calc import *
 from panda3dfunctions import *
 from entities import *
-import time
+
+# Game Class
 class Game(ShowBase):
     def __init__(self):
         ShowBase.__init__(self)

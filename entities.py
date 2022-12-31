@@ -8,7 +8,7 @@ import panda3dfunctions as p3f
 class GameObject:
     def __init__(self, pos: Vec3, render, model):
         # Obstacle's object
-        self.actor = Actor(model, {"walk": "models/car.gltf"})
+        self.actor = Actor("car.egg", {"walk": "models/car.egg"})
         self.actor.reparentTo(render)
         self.actor.setPos(pos)
 
@@ -29,16 +29,17 @@ class Obstacle(GameObject):
 
         match self.type:
             case "Obstacle":
-                self.model = p3f.panda3dFunc.load_model("obstacle.dae", showbase=self.showbase)
+                self.model = "models/car.egg"
             case "Money":
-                self.model = p3f.panda3dFunc.load_model("money.gltf", showbase=self.showbase)
-
-        self.model.setScale(0.25, 0.25, 0.25)
+                self.model = "models/car.egg"
 
         GameObject.__init__(self=self, pos=pos, render=render, model=self.model)
 
+        self.actor.setScale(0.25, 0.25, 0.25)
+
+
     def update(self, task):
         y = self.pos.y - 1
-        self.model.setPos(self.pos.x, y, self.pos.z)
+        self.actor.setPos(self.pos.x, y, self.pos.z)
         return task.cont
 
