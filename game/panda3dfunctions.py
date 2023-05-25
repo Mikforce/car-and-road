@@ -1,4 +1,3 @@
-
 class panda3dFunc:
     @staticmethod
     def load_model(model: str, showbase):
