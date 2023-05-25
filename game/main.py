@@ -11,6 +11,7 @@ from calc import *
 from panda3dfunctions import *
 from entities import *
 
+
 # Game Class
 class Game(ShowBase):
     def __init__(self):
@@ -36,7 +37,7 @@ class Game(ShowBase):
         # Set Texture
         self.car.set_texture(self.car_texture, 1)
 
-        #Reparent To
+        # Reparent To
         self.node.reparentTo(self.render)
         self.scene.reparentTo(self.render)
         self.car.reparentTo(self.carActorN)

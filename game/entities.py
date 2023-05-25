@@ -42,4 +42,3 @@ class Obstacle(GameObject):
         y = self.pos.y - 1
         self.actor.setPos(self.pos.x, y, self.pos.z)
         return task.cont
-
