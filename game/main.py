@@ -1,4 +1,5 @@
 # Other functions
+import random
 
 from direct.showbase.ShowBase import ShowBase
 from panda3d.core import *
@@ -7,7 +8,7 @@ from panda3d.physics import *
 
 import datetime
 # My functions
-from calc import *
+
 from panda3dfunctions import *
 from entities import *
 
@@ -21,7 +22,6 @@ class Game(ShowBase):
         # Flag for creating 1 obstacle
         self.obstacle_spawned = False
 
-        self.calc = Calculations()
         # Nodes
         self.node = NodePath("PhysicsNode")
 
@@ -67,33 +67,27 @@ class Game(ShowBase):
 
         self.is_down = self.mouseWatcherNode.is_button_down
 
-        self.moveArr = 1
-        self.list_obstacles = []
-
+        # The speed of the obstacle
+        self.speed = 0.55
         # Coordinates of the road by x
         self.arr = [-0.78, 0, 0.78]
 
     # Spawn new obstacles
     def spawn(self):
-        self.obstacle_new = self.loader.loadModel("models/car.gltf")
-        self.obstacle_new.ls()
-        self.obstacle_new.set_texture(self.obstacle_texture, 1)
-        self.obstacle_new.reparentTo(self.obstacleActorN)
-        self.obstacle_new.setScale(0.25, 0.25, 0.25)
-        self.list_obstacles.append(self.obstacle_new)
+        x_car, y_car, z_car = self.car.getPos()
+        self.obstacle = self.loader.loadModel("models/car.gltf")
+        self.obstacle.set_texture(self.obstacle_texture, 1)
+        self.obstacle.reparentTo(self.obstacleActorN)
+        self.obstacle.setScale(0.25, 0.25, 0.25)
+        self.obstacle_arr.append(self.obstacle)
+        # Spawn the appearance of obstacles in front of the car (random road)
+        self.obstacle.setPos(random.choice(self.arr), y_car + 200, z_car)
 
     # Spawn obstacles in front of the car (random road)
-    def spawn_obstacle(self):
-        x_car, y_car, z_car = self.car.getPos()
-        self.spawn()
-
-        # Spawn the appearance of obstacles in front of the car (random road)
-        random_road = (random.choice(self.arr), y_car + 200, z_car)
-        self.obstacle_new.setPos(random_road)
 
     def del_obstacle(self, obstacle):
         obstacle.removeNode()
-        self.list_obstacles.remove(obstacle)
+        self.obstacle_arr.remove(obstacle)
 
     # Input buttons
     def input(self):
@@ -111,44 +105,55 @@ class Game(ShowBase):
             case -0.78 | 0 | 0.78:
                 self.car.setPos(movement_x + x, y, self.arr[0])
 
-    # Moving obstacles, not a car
-    def run_car(self, task):
+    # Movement of all obstacles
+    def move_obstacles(self):
         x_car, y_car, z_car = self.car.getPos()
+        if len(self.obstacle_arr) != 0:
+            for obstacle in self.obstacle_arr:
+                x_obstacle, y_obstacle, z_obstacle = obstacle.getPos()
+                # Movement of each obstacle
+                obstacle.setPos(x_obstacle, y_obstacle - self.speed, z_obstacle)
 
-        # The length comparison is needed for the first run
-        if len(self.list_obstacles) != 0:
-            for obstacle in self.list_obstacles:
-                x, y, z = obstacle.getPos()
-                # Speed obstacle
-                obstacle.setPos(x, y - 0.5, z)
-
-                # Removes an obstacle when it disappears from view
-                if y_car - 10 >= y:
+                # If an obstacle is out of sight,
+                # then it is removed from the array of obstacles on the road
+                if y_car - 10 >= y_obstacle:
                     self.del_obstacle(obstacle)
 
-        # Camera movement
+    # Camera movement behind the typewriter
+    def move_camera(self):
+        x_car, y_car, z_car = self.car.getPos()
         self.camera.setPos(x_car, y_car - 10, z_car + 2)
-        # Blocking camera rotation
         self.camera.setHpr(0, 0, 0)
 
-        # An obstacle is created every 0.5 second
+    # Creating new obstacles on the road
+    def spawn_obstacles(self):
+        # Create new obstacles every 0.5 seconds
         if (datetime.datetime.now() - self.real_time).total_seconds() >= 0.5:
-            # Updating the spawn timer
+            # Updating the obstacle spawn timer
             self.real_time = datetime.datetime.now()
             # Self.obstacle_spawned - check for the correct spawn
             if not self.obstacle_spawned:
                 self.obstacle_spawned = True
-                # Spawn 2 obstacle
-                self.spawn_obstacle()
-                self.spawn_obstacle()
+                # Creating two new obstacles
+                self.spawn()
+                self.spawn()
             else:
                 self.obstacle_spawned = False
+
+        # Controlling the movement of the car, camera and obstacles on the road
+    def start_game(self, task):
+        # Move all the obstacles on the road
+        self.move_obstacles()
+        # Camera movement behind the typewriter
+        self.move_camera()
+        # Creating new obstacles on the road
+        self.spawn_obstacles()
         return Task.cont
 
 
 if __name__ == '__main__':
     game = Game()
     # Adding tasks to the car_run queue
-    game.taskMgr.add(game.run_car, "run_car")
+    game.taskMgr.add(game.start_game, "start_game")
     # Start game
     game.run()

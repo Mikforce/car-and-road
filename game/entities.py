@@ -14,12 +14,9 @@ class GameObject:
         self.actor.reparentTo(render)
         self.actor.setPos(pos)
 
-    def setPos(self, x: float, y: float, z: float):
-        self.actor.setPos(x, y, z)
-
 
 class Obstacle(GameObject):
-    def __init__(self, pos: Vec3, speed: int, chance_to_spawn: int, render, showbase):
+    def __init__(self, pos: Vec3, speed: float, chance_to_spawn: int, render):
         self.speed = speed
         if calc_.Calculations.check_chance(chance_to_spawn):
             self.type = "Money"
@@ -27,8 +24,6 @@ class Obstacle(GameObject):
             self.type = "Obstacle"
 
         self.pos = pos
-
-        self.showbase = showbase
 
         match self.type:
             case "Obstacle":
