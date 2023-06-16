@@ -1,8 +1,16 @@
-with open("start.bat", 'w') as bat:
-    with open("moduls.txt", 'r') as moduls:
-        bat.write(f"{moduls.read()}\npause")
+from subprocess import run
 
+# At the first launch, dependencies are loaded, and only after that the game starts.
+# On subsequent launches, the game starts immediately
 def start_game():
     with open("start.bat", 'w') as bat:
         with open("moduls.txt", 'r') as moduls:
-            bat.write(f"python game/main.py")
+            for command in moduls:
+                run(command.split())
+            bat.write("python game/main.py")
+    with open("start.bat", 'r') as run_game:
+        for command in run_game:
+            run(command.split())
+
+
+start_game()
